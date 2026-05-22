@@ -12,6 +12,10 @@ __pycache__/
 dist/
 build/
 
+# Сырые данные (скачиваются с Kaggle локально)
+data/raw/rows.csv
+data/raw/archive.zip
+
 # Артефакты pipeline (генерируются скриптами)
 data/index/
 data/processed/*.jsonl

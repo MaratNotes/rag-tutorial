@@ -11,7 +11,7 @@
 | Итерация | Название | Статус | Проверка |
 |:--------:|----------|:------:|----------|
 | 0 | Каркас проекта | ✅ | `uv sync` без ошибок |
-| 1 | Демо-данные Kaggle | ⬜ | JSON читается, ≥5 датасетов |
+| 1 | Демо-данные Kaggle | ✅ | JSON читается, ≥5 датасетов |
 | 2 | Ingestion | ⬜ | `documents.jsonl` создан |
 | 3 | Chunking | ⬜ | `chunks.jsonl`, тест chunking |
 | 4 | Индекс TF-IDF | ⬜ | файлы в `data/index/` |
@@ -19,11 +19,13 @@
 | 6 | Demo-ответ | ⬜ | ответ + источники без UI |
 | 7 | Streamlit UI | ⬜ | 3 demo-вопроса в браузере |
 | 8 | Тесты и README | ⬜ | `pytest` green, README воспроизводим |
+| 9 | Документ о данных и репозитории | ⬜ | `doc/DATA.md` — источники, назначение |
+| 10 | Домашнее задание | ⬜ | `homework/` — планирование + итерации |
 
 **Легенда:** ⬜ не начато · 🔄 в работе · ✅ готово · ❌ блокер
 
-**Текущая итерация:** 1  
-**Готовность MVP:** 1 / 9
+**Текущая итерация:** 2  
+**Готовность MVP:** 2 / 11
 
 ---
 
@@ -44,8 +46,9 @@ uv run python -c "import app.config"
 
 ## Итерация 1 — Демо-данные Kaggle
 
-- [ ] `data/raw/datasets.json` — 5–10 описаний (безработица, инфляция, ВВП…)
-- [ ] Поля: `id`, `name`, `text` (+ опционально `tags`, `kaggle_url`)
+- [x] `data/raw/datasets.json` — 9 жалоб CFPB (из `rows.csv`)
+- [x] Поля: `id` (номер записи 0…n), `name`, `text` (на русском)
+- [x] `data/raw/rows.csv` в `.gitignore` (скачивается локально с Kaggle)
 
 **Проверка:**
 ```bash
@@ -154,8 +157,70 @@ uv run pytest tests/ -v
 
 ---
 
+## Итерация 9 — Документ о данных и репозитории
+
+- [ ] `doc/DATA.md` — какие данные использованы, откуда, что индексируем / не индексируем
+- [ ] Раздел **«Назначение репозитория»** — для кого, что демонстрирует, границы MVP
+- [ ] Ссылки на источники (Kaggle / CFPB и т.п.), лицензия, дата выгрузки
+- [ ] Ссылка из корневого `README.md` на `doc/DATA.md`
+
+**Проверка:**
+```bash
+# файл существует, обязательные разделы на месте
+uv run python -c "
+from pathlib import Path
+p = Path('doc/DATA.md')
+t = p.read_text(encoding='utf-8')
+for s in ['## Источники данных', '## Назначение репозитория', '## Что индексируем']:
+    assert s in t, f'нет раздела: {s}'
+print('OK')
+"
+```
+
+---
+
+## Итерация 10 — Домашнее задание
+
+Структура: **сначала планирование (md-файлы по одному)**, **потом реализация (каждая итерация — отдельный шаг)**.
+
+- [ ] `homework/README.md` — цель задания, порядок шагов, критерии сдачи
+- [ ] `homework/00_planning/README.md` — обзор фазы планирования
+- [ ] Шаги планирования (отдельный файл на каждый md в `doc/`):
+  - [ ] `homework/00_planning/step_01_project_idea.md` → @00_project_idea.md
+  - [ ] `homework/00_planning/step_02_vision.md` → @vision.md
+  - [ ] `homework/00_planning/step_03_conventions.md` → @conventions.md
+  - [ ] `homework/00_planning/step_04_tasklist.md` → @tasklist.md
+  - [ ] `homework/00_planning/step_05_workflow.md` → @workflow.md
+- [ ] `homework/01_implementation/README.md` — обзор фазы реализации
+- [ ] Шаги реализации (отдельный файл на каждую итерацию 0–8):
+  - [ ] `iter_00_scaffold.md` … `iter_08_tests_readme.md`
+- [ ] В каждом step-файле: **что сделать**, **какие файлы**, **как проверить**, **ожидаемый результат**
+
+**Проверка:**
+```bash
+uv run python -c "
+from pathlib import Path
+required = [
+    'homework/README.md',
+    'homework/00_planning/README.md',
+    'homework/00_planning/step_01_project_idea.md',
+    'homework/00_planning/step_05_workflow.md',
+    'homework/01_implementation/README.md',
+    'homework/01_implementation/iter_00_scaffold.md',
+    'homework/01_implementation/iter_08_tests_readme.md',
+]
+for f in required:
+    assert Path(f).exists(), f'нет файла: {f}'
+print('OK:', len(required), 'файлов')
+"
+```
+
+---
+
 ## Критерий «MVP готов»
 
 - [ ] Все итерации ✅ в таблице прогресса
 - [ ] 3 demo-вопроса — ответ с источником; 1 negative — отказ
 - [ ] Студент может пройти путь: `data/raw/` → index → Streamlit
+- [ ] `doc/DATA.md` описывает данные и назначение репозитория
+- [ ] `homework/` — студент может пройти задание шаг за шагом (планирование → итерации)
